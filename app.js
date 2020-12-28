@@ -15,14 +15,49 @@ mongoose.connect("mongodb://localhost:27017/wikiDB", {
   useUnifiedTopology: true,
 });
 
-const wikiSchema = new mongoose.Schema({
+const articleSchema = new mongoose.Schema({
   title: String,
   content: String,
 });
 
-const Article = mongoose.model("Article", wikiSchema);
+const Article = mongoose.model("Article", articleSchema);
+
+app.get("/articles", function (req, res) {
+  Article.find({}, function (err, results) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.post("/articles", function (req, res) {
+  const newArticle = new Article({
+    title: req.body.title,
+    content: req.body.content,
+  });
+  newArticle.save(function (err) {
+    if(err){
+        res.send(err);
+    } else{
+        res.send("Success");
+    }
+  });
+});
+
+app.delete("/articles",function(req,res){
+    Article.deleteMany({},function(err,results){
+        if(err){
+            res.send(err)
+        } else{
+            
+            res.send("Successfully deleted all articles")
+        }
+    })
+});
 
 //listen on to port 3000
 app.listen(3000, function () {
-    console.log("Server started on port 3000");
-  });
+  console.log("Server started on port 3000");
+});
